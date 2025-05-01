@@ -10,8 +10,8 @@ type Book struct {
 	PublishedAt time.Time `json:"published_at" gorm:"not null"`
 	ISBN        string    `json:"isbn" gorm:"not null"`
 	Category    string    `json:"category" gorm:"not null"`
-	Stock       int       `json:"stock" gorm:"not null"`
-	Available   bool      `json:"available" gorm:"not null"`
-	Price       int       `json:"price" gorm:"not null"`
+	Stock       int       `json:"stock,omitempty" gorm:"not null"`
+	Available   bool      `json:"available,omitempty" gorm:"not null"`
+	Price       int       `json:"price,omitempty" gorm:"not null"`
 	Description string    `json:"description"`
 }

@@ -29,7 +29,7 @@ func (r *bookRepository) GetBooksByID(id int) (*model.Book, error) {
 
 func (r *bookRepository) GetAllBooks() ([]*model.Book, error) {
 	var books []*model.Book
-	if err := r.db.Where("stock > 0").Order("id ASC").Find(&books).Error; err != nil {
+	if err := r.db.Order("id ASC").Find(&books).Error; err != nil {
 		return nil, err
 	}
 	return books, nil

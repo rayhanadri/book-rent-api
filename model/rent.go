@@ -3,9 +3,11 @@ package model
 import "time"
 
 type Rent struct {
-	ID     int `json:"id,omitempty" gorm:"primaryKey"`
-	BookID int `json:"book_id" gorm:"not null"`
-	// Book   Book `json:"book" gorm:"foreignKey:BookID"`
+	ID int `json:"id,omitempty" gorm:"primaryKey"`
+
+	BookID int  `json:"book_id" gorm:"not null"`
+	Book   Book `json:"book" gorm:"foreignKey:BookID"`
+
 	UserID int `json:"user_id" gorm:"not null"`
 	// User   User `json:"user" gorm:"foreignKey:UserID"`
 

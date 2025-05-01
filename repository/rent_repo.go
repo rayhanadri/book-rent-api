@@ -23,22 +23,64 @@ func NewRentRepository(db *gorm.DB) RentRepository {
 }
 
 func (r *rentRepository) GetRentByID(user_id int, id int) (*model.Rent, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	var rent model.Rent
 	if err := r.db.Where("id = ? AND user_id = ?", id, user_id).First(&rent).Error; err != nil {
 		return nil, err
 	}
+
+	var bookInRent model.Book
+	if err := r.db.Where("id = ?", rent.BookID).First(&bookInRent).Error; err != nil {
+		return nil, err
+	}
+	bookInRent.Stock = 0
+	bookInRent.Available = false
+	bookInRent.Price = 0
+
+	rent.Book = bookInRent
+
 	return &rent, nil
 }
 
 func (r *rentRepository) GetAllRent(user_id int) (*[]model.Rent, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	var rents []model.Rent
 	if err := r.db.Where("user_id = ?", user_id).Find(&rents).Error; err != nil {
 		return nil, err
 	}
+
+	for i := 0; i < len(rents); i++ {
+		var bookInRent model.Book
+		if err := r.db.Where("id = ?", rents[i].BookID).First(&bookInRent).Error; err != nil {
+			return nil, err
+		}
+		bookInRent.Stock = 0
+		bookInRent.Available = false
+		bookInRent.Price = 0
+
+		rents[i].Book = bookInRent
+	}
+
 	return &rents, nil
 }
 
 func (r *rentRepository) CreateRent(user_id int, rent *model.Rent) (*model.Rent, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	// set rent user id
 	rent.UserID = user_id
 
@@ -74,10 +116,27 @@ func (r *rentRepository) CreateRent(user_id int, rent *model.Rent) (*model.Rent,
 		return nil, err
 	}
 
+	// book in rent
+	var bookInRent model.Book
+	if err := r.db.Where("id = ?", rent.BookID).First(&bookInRent).Error; err != nil {
+		return nil, err
+	}
+	bookInRent.Stock = 0
+	bookInRent.Available = false
+	bookInRent.Price = 0
+
+	rent.Book = bookInRent
+
 	return rent, nil
 }
 
 func (r *rentRepository) ReturnRent(user_id int, id int) (*model.Rent, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	//get rent data by id
 	var rent model.Rent
 
@@ -114,7 +173,17 @@ func (r *rentRepository) ReturnRent(user_id int, id int) (*model.Rent, error) {
 	if err != nil {
 		return nil, errors.New("failed to update book stock")
 	}
-	//
+
+	// book in rent
+	var bookInRent model.Book
+	if err := r.db.Where("id = ?", rent.BookID).First(&bookInRent).Error; err != nil {
+		return nil, err
+	}
+	bookInRent.Stock = 0
+	bookInRent.Available = false
+	bookInRent.Price = 0
+
+	rent.Book = bookInRent
 
 	return &rent, nil
 }

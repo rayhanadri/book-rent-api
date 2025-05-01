@@ -23,6 +23,12 @@ func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 }
 
 func (r *transactionRepository) GetAllTransaction(user_id int) (*[]model.Transaction, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	var transactions *[]model.Transaction
 	if err := r.db.Where("user_id = ?", user_id).Find(&transactions).Error; err != nil {
 		return nil, err
@@ -31,6 +37,12 @@ func (r *transactionRepository) GetAllTransaction(user_id int) (*[]model.Transac
 }
 
 func (r *transactionRepository) CreateTransaction(user_id int, transaction *model.Transaction) (*model.Transaction, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	transaction.UserID = user_id
 
 	// validate transaction data
@@ -60,6 +72,12 @@ func (r *transactionRepository) CreateTransaction(user_id int, transaction *mode
 }
 
 func (r *transactionRepository) UpdateTransaction(user_id int, transaction *model.Transaction) (*model.Transaction, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	transaction.UserID = user_id
 
 	if transaction.TransactionType == "Topup" {
@@ -76,6 +94,12 @@ func (r *transactionRepository) UpdateTransaction(user_id int, transaction *mode
 }
 
 func (r *transactionRepository) GetTransactionByID(user_id int, transactionID int) (*model.Transaction, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
 	transaction := new(model.Transaction)
 	if err := r.db.Where("user_id = ? AND id = ?", user_id, transactionID).First(transaction).Error; err != nil {
 		return nil, err
