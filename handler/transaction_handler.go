@@ -483,7 +483,7 @@ func (h *transactionHandler) CancelTransaction(c echo.Context) error {
 	// Release the book if the transaction is a rent
 	if transaction.TransactionType == "Rent" {
 		var rent model.Rent
-		err := db.Where("id = ? AND id_user = ?", transaction.RentID, userIdInt).First(&rent).Error
+		err := db.Where("id = ? AND user_id = ?", transaction.RentID, userIdInt).First(&rent).Error
 		if err != nil {
 			return c.JSON(404, model.Response{
 				Status:  404,
