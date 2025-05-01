@@ -54,16 +54,18 @@ func ExecRouter() {
 	g.GET("/books/:id", bookHandler.GetBooksByID) // Get book by ID
 
 	// Rent routes
-	g.GET("/rents", rentHandler.GetAllRent, mw.CheckAuthMiddleware)            // Get all rents for a user
-	g.GET("/rents/:id", rentHandler.GetRentByID, mw.CheckAuthMiddleware)       // Get rent by ID for a user
-	g.POST("/rents", rentHandler.CreateRent, mw.CheckAuthMiddleware)           // Create a new rent for a user
-	g.PUT("/rents/return/:id", rentHandler.ReturnRent, mw.CheckAuthMiddleware) // Return a rent for a user
+	g.GET("/rents", rentHandler.GetAllRent, mw.CheckAuthMiddleware)               // Get all rents for a user
+	g.GET("/rents/:id", rentHandler.GetRentByID, mw.CheckAuthMiddleware)          // Get rent by ID for a user
+	g.POST("/rents", rentHandler.CreateRent, mw.CheckAuthMiddleware)              // Create a new rent for a user
+	g.PUT("/rents/return/:id", rentHandler.ReturnRent, mw.CheckAuthMiddleware)    // Return a rent for a user
+	g.DELETE("/rents/cancel/:id", rentHandler.CancelRent, mw.CheckAuthMiddleware) // Cancel a rent for a user
 
 	// Transaction routes
-	g.POST("/transactions/create-transaction", transHandler.CreateTransaction, mw.CheckAuthMiddleware)    // Create a new transaction, can be topup or rent
-	g.PUT("/transactions/update-transaction/:id", transHandler.UpdateTransaction, mw.CheckAuthMiddleware) // Update transaction by ID, confirm to complete the transaction
-	g.GET("/transactions", transHandler.GetAllTransaction, mw.CheckAuthMiddleware)                        // Get all transactions for a user
-	g.GET("/transactions/:id", transHandler.GetTransactionByID, mw.CheckAuthMiddleware)                   // Get transaction by ID for a user
+	g.POST("/transactions/create-transaction", transHandler.CreateTransaction, mw.CheckAuthMiddleware)       // Create a new transaction, can be topup or rent
+	g.PUT("/transactions/update-transaction/:id", transHandler.UpdateTransaction, mw.CheckAuthMiddleware)    // Update transaction by ID, confirm to complete the transaction
+	g.GET("/transactions", transHandler.GetAllTransaction, mw.CheckAuthMiddleware)                           // Get all transactions for a user
+	g.GET("/transactions/:id", transHandler.GetTransactionByID, mw.CheckAuthMiddleware)                      // Get transaction by ID for a user
+	g.DELETE("/transactions/cancel-transaction/:id", transHandler.CancelTransaction, mw.CheckAuthMiddleware) // Update transaction by ID, confirm to complete the transaction
 
 	// Start server
 	port := os.Getenv("PORT")

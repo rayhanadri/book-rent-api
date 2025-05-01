@@ -41,3 +41,11 @@ func (m *MockTransactionRepository) GetTransactionByID(user_id int, transactionI
 	}
 	return nil, args.Error(1)
 }
+
+func (m *MockTransactionRepository) CancelTransaction(user_id int, transactionID int) (*model.Transaction, error) {
+	args := m.Called(user_id, transactionID)
+	if transaction := args.Get(0); transaction != nil {
+		return transaction.(*model.Transaction), args.Error(1)
+	}
+	return nil, args.Error(1)
+}

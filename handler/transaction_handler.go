@@ -18,6 +18,7 @@ type TransactionHandler interface {
 	CreateTransaction(c echo.Context) error
 	GetTransactionByID(c echo.Context) error
 	UpdateTransaction(c echo.Context) error
+	CancelTransaction(c echo.Context) error
 }
 
 type transactionHandler struct {
@@ -131,6 +132,50 @@ func (h *transactionHandler) CreateTransaction(c echo.Context) error {
 	//transaction check
 	if transaction.PaymentMethod == "App Balance" {
 		if user.Balance < transaction.Amount {
+
+			// Release the book if the transaction is a rent and the user has insufficient balance
+			if transaction.TransactionType == "Rent" {
+				var rent model.Rent
+				err := db.Where("id = ?", transaction.RentID).First(&rent).Error
+				if err != nil {
+					return c.JSON(404, model.Response{
+						Status:  404,
+						Message: "Rent not found",
+					})
+				}
+				rent.RentStatus = "CANCELED"
+
+				var book model.Book
+				err = db.Where("id = ?", rent.BookID).First(&book).Error
+				if err != nil {
+					return c.JSON(404, model.Response{
+						Status:  404,
+						Message: "Book not found",
+					})
+				}
+
+				book.Stock += rent.Quantity
+				if book.Stock > 0 {
+					book.Available = true
+				} else {
+					book.Available = false
+				}
+
+				if err := db.Save(&book).Error; err != nil {
+					return c.JSON(500, model.Response{
+						Status:  500,
+						Message: "Internal Server Error",
+					})
+				}
+				if err := db.Save(&rent).Error; err != nil {
+					return c.JSON(500, model.Response{
+						Status:  500,
+						Message: "Internal Server Error",
+					})
+				}
+
+			}
+
 			return c.JSON(400, model.Response{
 				Status:  400,
 				Message: "Insufficient balance",
@@ -147,7 +192,6 @@ func (h *transactionHandler) CreateTransaction(c echo.Context) error {
 
 		transaction.Status = "PAID"
 		transaction.InvoiceID = "PAID_BY_USER_APP_BALANCE"
-
 	}
 
 	if transaction.PaymentMethod == "Payment Gateway" {
@@ -357,6 +401,131 @@ func (h *transactionHandler) UpdateTransaction(c echo.Context) error {
 			Message: "Invoice is not paid",
 		})
 	}
+}
+
+// CancelTransaction godoc
+// @Summary Cancel a transaction based on the invoice status
+// @Description Get details of a specific transaction by its ID
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer <access_token>"
+// @Param id path int true "Transaction ID"
+// @Param model.Transaction body model.Transaction true "Transaction object"
+// @Success 200 {object} model.Response
+// @Router /transactions/cancel-transaction/{id} [delete] // Updated the router path to use DELETE method
+func (h *transactionHandler) CancelTransaction(c echo.Context) error {
+	//get user id from context
+	userID := c.Get("user_id")
+	if userID == nil {
+		return c.JSON(http.StatusUnauthorized, model.Response{
+			Status:  http.StatusUnauthorized,
+			Message: "User not authenticated",
+		})
+	}
+
+	userIdFloat, ok := userID.(float64)
+	if !ok {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Invalid user ID",
+		})
+	}
+	userIdInt := int(userIdFloat)
+
+	// get transaction id from url param
+	transaction_id := c.Param("id")
+
+	// get stored transaction
+	transaction := new(model.Transaction)
+
+	// Initialize the database connection
+	var db = config.DB
+	if err := db.Where("id = ?", transaction_id).First(&transaction).Error; err != nil {
+		return c.JSON(404, model.Response{
+			Status:  404,
+			Message: "Transaction not found",
+		})
+	}
+
+	//Check if transaction already paid, return already paid, no need to update
+	if transaction.Status == "PAID" {
+		return c.JSON(400, model.Response{
+			Status:  400,
+			Message: "Transaction already paid, can't update",
+		})
+	}
+
+	//Check transaction status from external API
+	invoice, err := external.GetInvoice(transaction.InvoiceID)
+	if err != nil {
+		return c.JSON(500, model.Response{
+			Status:  500,
+			Message: "Failed to get invoice",
+		})
+	}
+
+	if invoice.Status == "PAID" {
+		return c.JSON(400, model.Response{
+			Status:  400,
+			Message: "Invoice is already paid, use confirm endpoint to confirm",
+		})
+	}
+
+	transaction, err = h.transactionRepo.CancelTransaction(userIdInt, transaction.ID)
+	if err != nil {
+		return c.JSON(500, model.Response{
+			Status:  500,
+			Message: "Internal Server Error, Error when canceling transaction",
+		})
+	}
+
+	// Release the book if the transaction is a rent
+	if transaction.TransactionType == "Rent" {
+		var rent model.Rent
+		err := db.Where("id = ? AND id_user = ?", transaction.RentID, userIdInt).First(&rent).Error
+		if err != nil {
+			return c.JSON(404, model.Response{
+				Status:  404,
+				Message: "Rent not found",
+			})
+		}
+		rent.RentStatus = "CANCELED"
+
+		if err := db.Save(&rent).Error; err != nil {
+			return c.JSON(500, model.Response{
+				Status:  500,
+				Message: "Internal Server Error, Error when updating rent status",
+			})
+		}
+
+		var book model.Book
+		err = db.Where("id = ?", rent.BookID).First(&book).Error
+		if err != nil {
+			return c.JSON(404, model.Response{
+				Status:  404,
+				Message: "Book not found",
+			})
+		}
+		book.Stock += rent.Quantity
+		if book.Stock > 0 {
+			book.Available = true
+		} else {
+			book.Available = false
+		}
+
+		if err := db.Save(&book).Error; err != nil {
+			return c.JSON(500, model.Response{
+				Status:  500,
+				Message: "Internal Server Error",
+			})
+		}
+	}
+
+	return c.JSON(200, model.Response{
+		Status:  200,
+		Message: "Transaction canceled successfully",
+	})
 }
 
 // GetTransactionByID godoc

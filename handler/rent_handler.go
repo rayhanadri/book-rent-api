@@ -9,6 +9,8 @@ import (
 
 	"net/http"
 
+	"gorm.io/gorm"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,6 +19,7 @@ type RentHandler interface {
 	GetAllRent(c echo.Context) error
 	CreateRent(c echo.Context) error
 	ReturnRent(c echo.Context) error
+	CancelRent(c echo.Context) error
 }
 
 type rentHandler struct {
@@ -320,6 +323,101 @@ func (h *rentHandler) ReturnRent(c echo.Context) error {
 	return c.JSON(http.StatusOK, model.Response{
 		Status:  http.StatusOK,
 		Message: "Rent returned successfully",
+		Data:    rent,
+	})
+}
+
+// CancelRent godoc
+// @Summary Cancel a rent
+// @Description process the cancellation of a rent by its ID
+// @Tags rents
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer <access_token>"
+// @Param id path int true "Rent ID"
+// @Success 200 {object} model.Response
+// @Router /rents/cancel/{id} [delete] // Updated the router path to use cancel method
+func (h *rentHandler) CancelRent(c echo.Context) error {
+	//get user id from context
+	userID := c.Get("user_id")
+	if userID == nil {
+		return c.JSON(http.StatusUnauthorized, model.Response{
+			Status:  http.StatusUnauthorized,
+			Message: "User not authenticated",
+		})
+	}
+
+	userIdFloat, ok := userID.(float64)
+	if !ok {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Invalid user ID",
+		})
+	}
+	userIdInt := int(userIdFloat)
+
+	//get rent id from param
+	rentID := c.Param("id")
+	if rentID == "" {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Rent ID is required",
+		})
+	}
+
+	// Convert rentID to int
+	rentIDInt, err := strconv.Atoi(rentID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Invalid rent ID",
+		})
+	}
+
+	//Check existing rent by ID
+	existingRent, err := h.rentRepo.GetRentByID(userIdInt, rentIDInt)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, model.Response{
+			Status:  http.StatusNotFound,
+			Message: "Rent not found",
+		})
+	}
+
+	if existingRent.RentStatus != "PENDING" {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Only pending rents can be canceled",
+		})
+	}
+
+	// check if rent has transaction
+	var db = config.DB
+	var transaction model.Transaction
+	err = db.Where("rent_id = ?", rentIDInt).First(&transaction).Error
+	if err == nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Rent has transaction, please cancel from transaction",
+		})
+	} else if err != gorm.ErrRecordNotFound {
+		return c.JSON(http.StatusInternalServerError, model.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "Failed to check transaction",
+		})
+	}
+
+	rent := new(model.Rent)
+	rent, err = h.rentRepo.CancelRent(userIdInt, rentIDInt)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "Failed to cancel rent",
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		Status:  http.StatusOK,
+		Message: "Rent canceled successfully",
 		Data:    rent,
 	})
 }

@@ -242,3 +242,50 @@ func TestUpdateTransaction_Failed(t *testing.T) {
 
 	mockRepo.AssertExpectations(t)
 }
+
+func TestCancelTransaction_Success(t *testing.T) {
+	mockRepo := new(repository.MockTransactionRepository)
+
+	// Representing a mock transaction object
+	mockUserId := 1
+	mockTransaction := model.Transaction{
+		ID:              1,
+		TransactionType: "Rent",
+		PaymentMethod:   "Payment Gateway",
+		Amount:          5000,
+		Status:          "CANCELED",
+		Description:     "Rent Book",
+		UserID:          mockUserId,
+		InvoiceID:       "INV-12345",
+		InvoiceURL:      "https://example.com/invoice/12345",
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
+		RentID:          1,
+	}
+	mockTransactionPtr := &mockTransaction
+
+	// Representing canceling a transaction in the database
+	mockRepo.On("CancelTransaction", mockUserId, 1).Return(mockTransactionPtr, nil)
+	transactionPtr, err := mockRepo.CancelTransaction(mockUserId, 1)
+
+	// Check if the transaction is canceled successfully
+	assert.NoError(t, err)
+	assert.NotNil(t, transactionPtr)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestCancelTransaction_Failed(t *testing.T) {
+	mockRepo := new(repository.MockTransactionRepository)
+
+	// Representing canceling a transaction in the database
+	mockUserId := 1
+	mockRepo.On("CancelTransaction", mockUserId, 1).Return(nil, assert.AnError)
+	transactionPtr, err := mockRepo.CancelTransaction(mockUserId, 1)
+
+	// Check if the transaction is canceled successfully
+	assert.Error(t, err)
+	assert.Nil(t, transactionPtr)
+
+	mockRepo.AssertExpectations(t)
+}

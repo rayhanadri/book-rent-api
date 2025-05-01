@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"library-api/model"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -12,6 +13,7 @@ type TransactionRepository interface {
 	CreateTransaction(user_id int, transaction *model.Transaction) (*model.Transaction, error)
 	GetTransactionByID(user_id int, transactionID int) (*model.Transaction, error)
 	UpdateTransaction(user_id int, transaction *model.Transaction) (*model.Transaction, error)
+	CancelTransaction(user_id int, transactionID int) (*model.Transaction, error)
 }
 
 type transactionRepository struct {
@@ -80,7 +82,36 @@ func (r *transactionRepository) UpdateTransaction(user_id int, transaction *mode
 
 	transaction.UserID = user_id
 
-	if transaction.TransactionType == "Topup" {
+	if transaction.TransactionType != "Rent" {
+		if err := r.db.Omit("rent_id").Save(transaction).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := r.db.Save(transaction).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return transaction, nil
+}
+
+func (r *transactionRepository) CancelTransaction(user_id int, transactionID int) (*model.Transaction, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	// check if transaction exists
+	transaction := new(model.Transaction)
+	if err := r.db.Where("user_id = ? AND id = ?", user_id, transactionID).First(transaction).Error; err != nil {
+		return nil, errors.New("transaction not found")
+	}
+
+	transaction.Status = "CANCELED"
+	transaction.UpdatedAt = time.Now()
+
+	if transaction.TransactionType != "Rent" {
 		if err := r.db.Omit("rent_id").Save(transaction).Error; err != nil {
 			return nil, err
 		}

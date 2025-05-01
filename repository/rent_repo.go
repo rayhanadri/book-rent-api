@@ -12,6 +12,7 @@ type RentRepository interface {
 	GetRentByID(user_id int, id int) (*model.Rent, error)
 	CreateRent(user_id int, rent *model.Rent) (*model.Rent, error)
 	ReturnRent(user_id int, id int) (*model.Rent, error)
+	CancelRent(user_id int, id int) (*model.Rent, error)
 }
 
 type rentRepository struct {
@@ -148,6 +149,64 @@ func (r *rentRepository) ReturnRent(user_id int, id int) (*model.Rent, error) {
 
 	//update rent status to DONE and save it
 	rent.RentStatus = "DONE"
+	err = r.db.Save(&rent).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the book stock
+	var book model.Book
+	err = r.db.Where("id = ?", rent.BookID).First(&book).Error
+	if err != nil {
+		return nil, errors.New("book not found")
+	}
+
+	// Update quantity and availability of the book
+	book.Stock += rent.Quantity
+	if book.Stock >= 1 {
+		book.Available = true
+	} else {
+		book.Available = false
+	}
+
+	// Save the updated book data
+	err = r.db.Save(&book).Error
+	if err != nil {
+		return nil, errors.New("failed to update book stock")
+	}
+
+	// book in rent
+	var bookInRent model.Book
+	if err := r.db.Where("id = ?", rent.BookID).First(&bookInRent).Error; err != nil {
+		return nil, err
+	}
+	bookInRent.Stock = 0
+	bookInRent.Available = false
+	bookInRent.Price = 0
+
+	rent.Book = bookInRent
+
+	return &rent, nil
+}
+
+func (r *rentRepository) CancelRent(user_id int, id int) (*model.Rent, error) {
+	// validate user id
+	user := new(model.User)
+	if err := r.db.Where("id = ?", user_id).First(&user).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	//get rent data by id
+	var rent model.Rent
+
+	//find rent by id and user id
+	err := r.db.Where("id = ? AND user_id = ?", id, user_id).First(&rent).Error
+	if err != nil {
+		return nil, errors.New("rent not found")
+	}
+
+	//update rent status to CANCELED and save it
+	rent.RentStatus = "CANCELED"
 	err = r.db.Save(&rent).Error
 	if err != nil {
 		return nil, err

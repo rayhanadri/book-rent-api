@@ -214,3 +214,52 @@ func TestReturnRent_Failed(t *testing.T) {
 
 	mockRepo.AssertExpectations(t)
 }
+
+func TestCancelRent_Success(t *testing.T) {
+	mockRepo := new(repository.MockRentRepository)
+
+	// Representing a mock transaction object
+	// Representing a mock transaction object
+	mockUserId := 1
+	mockRentId := 1
+
+	mockRent := model.Rent{
+		ID:            1,
+		BookID:        1,
+		UserID:        mockUserId,
+		Quantity:      1,
+		TotalPrice:    5000,
+		RentStartDate: time.Now(),
+		RentEndDate:   time.Now().Add(7 * 24 * time.Hour),
+		RentStatus:    "CANCELED",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+	}
+	mockRentPtr := &mockRent
+
+	// Representing retrieving a transaction by ID from the database
+	mockRepo.On("CancelRent", mockUserId, mockRentId).Return(mockRentPtr, nil)
+	rentDone, err := mockRepo.CancelRent(mockUserId, mockRentId)
+
+	// Check if the transaction is retrieved successfully
+	assert.NoError(t, err)
+	assert.NotNil(t, rentDone)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func TestCancelRent_Failed(t *testing.T) {
+	mockRepo := new(repository.MockRentRepository)
+
+	// Representing retrieving a transaction by ID from the database
+	mockUserId := 1
+	mockRentId := 1
+	mockRepo.On("CancelRent", mockUserId, mockRentId).Return(nil, assert.AnError)
+	rentDone, err := mockRepo.CancelRent(mockUserId, mockRentId)
+
+	// Check if the transaction retrieval failed as expected
+	assert.Error(t, err)
+	assert.Nil(t, rentDone)
+
+	mockRepo.AssertExpectations(t)
+}

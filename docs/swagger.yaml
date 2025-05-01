@@ -161,6 +161,32 @@ paths:
       summary: Get a rent by ID
       tags:
       - rents
+  /rents/cancel/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: process the cancellation of a rent by its ID
+      parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Rent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Cancel a rent
+      tags:
+      - rents
   /rents/return/{id}:
     put:
       consumes:
@@ -211,6 +237,38 @@ paths:
           schema:
             $ref: '#/definitions/model.Response'
       summary: Get Transaction details by Transaction ID
+      tags:
+      - transactions
+  /transactions/cancel-transaction/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Get details of a specific transaction by its ID
+      parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Transaction object
+        in: body
+        name: model.Transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Cancel a transaction based on the invoice status
       tags:
       - transactions
   /transactions/create-transaction:
