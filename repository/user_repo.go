@@ -41,6 +41,10 @@ func (r *userRepository) CreateUser(user *model.User) (*model.User, error) {
 		return nil, errors.New("password must be at least 6 characters long")
 	}
 
+	//assign default values
+	user.Role = "user"
+	user.Status = "ACTIVE"
+
 	userPass := user.Password
 	userPassHash, err := bcrypt.GenerateFromPassword([]byte(userPass), bcrypt.DefaultCost)
 	if err != nil {

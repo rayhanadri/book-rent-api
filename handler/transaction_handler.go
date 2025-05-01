@@ -34,7 +34,7 @@ func NewTransactionHandler(transactionRepo repository.TransactionRepository) Tra
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Authorization header string true "Bearer <access_token>"
+// @Param Authorization header string true "Bearer <access_token>"
 // @Success 200 {object} model.Response
 // @Router /users/{id} [get]
 func (h *transactionHandler) GetAllTransaction(c echo.Context) error {
@@ -76,7 +76,7 @@ func (h *transactionHandler) GetAllTransaction(c echo.Context) error {
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Authorization header string true "Bearer <access_token>"
+// @Param Authorization header string true "Bearer <access_token>"
 // @Param model.Transaction body model.Transaction true "Transaction object"
 // @Success 201 {object} model.Response
 // @Router /transactions/create-transaction [post] // Updated the router path to use POST method
@@ -216,7 +216,7 @@ func (h *transactionHandler) CreateTransaction(c echo.Context) error {
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Authorization header string true "Bearer <access_token>"
+// @Param Authorization header string true "Bearer <access_token>"
 // @Param id path int true "Transaction ID"
 // @Param model.Transaction body model.Transaction true "Transaction object"
 // @Success 200 {object} model.Response
@@ -365,7 +365,7 @@ func (h *transactionHandler) UpdateTransaction(c echo.Context) error {
 // @Tags transactions
 // @Accept json
 // @Produce json
-// @Authorization header string true "Bearer <access_token>"
+// @Param Authorization header string true "Bearer <access_token>"
 // @Param id path int true "Transaction ID"
 // @Success 200 {object} model.Response
 // @Router /transactions/{id} [get] // Updated the router path to include transaction ID

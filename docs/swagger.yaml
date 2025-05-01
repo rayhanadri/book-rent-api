@@ -35,25 +35,20 @@ definitions:
       user_id:
         type: integer
     type: object
-  model.User:
+  model.UserLogin:
     properties:
-      balance:
-        type: integer
-      created_at:
-        type: string
       email:
-        type: string
-      id:
-        type: integer
-      name:
         type: string
       password:
         type: string
-      role:
+    type: object
+  model.UserRegister:
+    properties:
+      email:
         type: string
-      status:
+      name:
         type: string
-      updated_at:
+      password:
         type: string
     type: object
 host: localhost:8080
@@ -104,6 +99,12 @@ paths:
       consumes:
       - application/json
       description: Retrieve all rents for a user
+      parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -118,6 +119,12 @@ paths:
       consumes:
       - application/json
       description: Create a new rent for a user
+      parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -134,6 +141,11 @@ paths:
       - application/json
       description: Retrieve a rent's details by its ID
       parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Rent ID
         in: path
         name: id
@@ -155,6 +167,11 @@ paths:
       - application/json
       description: Process the return of a rent by its ID
       parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Rent ID
         in: path
         name: id
@@ -176,6 +193,11 @@ paths:
       - application/json
       description: Get details of a specific transaction by its ID
       parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Transaction ID
         in: path
         name: id
@@ -197,6 +219,11 @@ paths:
       - application/json
       description: Create a new transaction for a user
       parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Transaction object
         in: body
         name: model.Transaction
@@ -219,6 +246,11 @@ paths:
       - application/json
       description: Get details of a specific transaction by its ID
       parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Transaction ID
         in: path
         name: id
@@ -240,33 +272,17 @@ paths:
       summary: Update a transaction based on the invoice status
       tags:
       - transactions
-  /users:
-    post:
-      consumes:
-      - application/json
-      description: Register a new user
-      parameters:
-      - description: User object
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/model.User'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/model.Response'
-      summary: Register a new user
-      tags:
-      - users
   /users/{id}:
     get:
       consumes:
       - application/json
       description: Get all transactions for an active user
+      parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -277,27 +293,6 @@ paths:
       summary: Get all transactions for a user
       tags:
       - transactions
-    put:
-      consumes:
-      - application/json
-      description: Update user information
-      parameters:
-      - description: User object
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/model.User'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Response'
-      summary: Update user details
-      tags:
-      - users
   /users/login:
     post:
       consumes:
@@ -309,7 +304,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/model.UserLogin'
       produces:
       - application/json
       responses:
@@ -326,11 +321,11 @@ paths:
       - application/json
       description: Current User Details
       parameters:
-      - description: User ID
-        in: path
-        name: id
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -341,11 +336,37 @@ paths:
       summary: Get Current User Details
       tags:
       - users
+    put:
+      consumes:
+      - application/json
+      description: Update user information
+      parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Update user details
+      tags:
+      - users
   /users/refresh-token:
     post:
       consumes:
       - application/json
       description: Refresh the access token using the refresh token
+      parameters:
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -354,6 +375,28 @@ paths:
           schema:
             $ref: '#/definitions/model.Response'
       summary: Refresh user access token
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Register a new user
       tags:
       - users
 swagger: "2.0"
