@@ -82,8 +82,8 @@ func rootShow(c echo.Context) error {
 	rootURL := c.Request().Host + c.Request().RequestURI
 
 	welcomeData := welcome{
-		BaseURL:          rootURL + "api/v1",
-		DocumentationURL: rootURL + "api/v1" + "/swagger/index.html",
+		BaseURL:          rootURL + "api/v1/",
+		DocumentationURL: rootURL + "api/v1/" + "swagger/index.html",
 	}
 
 	var response model.Response
