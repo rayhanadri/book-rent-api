@@ -525,6 +525,7 @@ func (h *transactionHandler) CancelTransaction(c echo.Context) error {
 	return c.JSON(200, model.Response{
 		Status:  200,
 		Message: "Transaction canceled successfully",
+		Data:    transaction,
 	})
 }
 
