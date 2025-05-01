@@ -33,6 +33,8 @@ func NewRentHandler(rentRepo repository.RentRepository) RentHandler {
 // @Tags rents
 // @Accept json
 // @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Param id path int true "Rent ID" // Updated parameter description
 // @Success 200 {object} model.Response
 // @Router /rents/{id} [get]
 func (h *rentHandler) GetRentByID(c echo.Context) error {
@@ -89,6 +91,15 @@ func (h *rentHandler) GetRentByID(c echo.Context) error {
 	})
 }
 
+// GetAllRent godoc
+// @Summary Get all rents
+// @Description Retrieve all rents for a user
+// @Tags rents
+// @Accept json
+// @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Success 200 {object} model.Response
+// @Router /rents [get] // Updated the router path to get all rents
 func (h *rentHandler) GetAllRent(c echo.Context) error {
 	//get user id from context
 	userID := c.Get("user_id")
@@ -135,6 +146,15 @@ func (h *rentHandler) GetAllRent(c echo.Context) error {
 	})
 }
 
+// Create Rent godoc
+// @Summary Create a new rent
+// @Description Create a new rent for a user
+// @Tags rents
+// @Accept json
+// @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Success 201 {object} model.Response
+// @Router /rents [post] // Updated the router path to use POST method
 func (h *rentHandler) CreateRent(c echo.Context) error {
 	//get user id from context
 	userID := c.Get("user_id")
@@ -225,6 +245,16 @@ func (h *rentHandler) CreateRent(c echo.Context) error {
 	})
 }
 
+// ReturnRent godoc
+// @Summary Return a rent
+// @Description Process the return of a rent by its ID
+// @Tags rents
+// @Accept json
+// @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Param id path int true "Rent ID"
+// @Success 200 {object} model.Response
+// @Router /rents/return/{id} [put]
 func (h *rentHandler) ReturnRent(c echo.Context) error {
 	//get user id from context
 	userID := c.Get("user_id")

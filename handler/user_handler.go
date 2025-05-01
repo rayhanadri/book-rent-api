@@ -38,6 +38,8 @@ func NewUserHandler(userRepo repository.UserRepository) UserHandler {
 // @Tags users
 // @Accept json
 // @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Param id path int true "User ID"
 // @Success 200 {object} model.Response
 // @Router /users/me [get]
 func (h *userHandler) GetUserByID(c echo.Context) error {
@@ -90,6 +92,7 @@ func (h *userHandler) GetUserByID(c echo.Context) error {
 // @Tags users
 // @Accept json
 // @Produce json
+// @Param user body model.User true "User object"
 // @Success 201 {object} model.Response
 // @Router /users [post]
 func (h *userHandler) CreateUser(c echo.Context) error {
@@ -132,6 +135,7 @@ func (h *userHandler) CreateUser(c echo.Context) error {
 // @Tags users
 // @Accept json
 // @Produce json
+// @Param user body model.User true "User object"
 // @Success 200 {object} model.Response
 // @Router /users/login [post]
 func (h *userHandler) LoginUser(c echo.Context) error {
@@ -211,6 +215,7 @@ func (h *userHandler) LoginUser(c echo.Context) error {
 // @Tags users
 // @Accept json
 // @Produce json
+// @Authorization header string true "Bearer <refresh_token>"
 // @Success 200 {object} model.Response
 // @Router /users/refresh-token [post] // Updated the router path to use POST method
 func (h *userHandler) RefreshToken(c echo.Context) error {
@@ -310,6 +315,8 @@ func GenerateTokens(user *model.User) (string, string, error) {
 // @Tags users
 // @Accept json
 // @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Param user body model.User true "User object"
 // @Success 200 {object} model.Response
 // @Router /users/{id} [put] // Updated the router path to include user ID
 func (h *userHandler) UpdateUser(c echo.Context) error {

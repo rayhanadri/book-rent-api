@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/books": {
             "get": {
-                "description": "Get all books in the library",
+                "description": "Retrieve all books' details",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,15 +27,12 @@ const docTemplate = `{
                 "tags": [
                     "books"
                 ],
-                "summary": "Get list of books",
+                "summary": "Get all books",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/model.Response"
                         }
                     }
                 }
@@ -54,6 +51,91 @@ const docTemplate = `{
                     "books"
                 ],
                 "summary": "Get a book by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Book ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/rents": {
+            "get": {
+                "description": "Retrieve all rents for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rents"
+                ],
+                "summary": "Get all rents",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new rent for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rents"
+                ],
+                "summary": "Create a new rent",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/rents/return/{id}": {
+            "put": {
+                "description": "Process the return of a rent by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rents"
+                ],
+                "summary": "Return a rent",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -77,6 +159,122 @@ const docTemplate = `{
                     "rents"
                 ],
                 "summary": "Get a rent by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/create-transaction": {
+            "post": {
+                "description": "Create a new transaction for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Create a new transaction",
+                "parameters": [
+                    {
+                        "description": "Transaction object",
+                        "name": "model.Transaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Transaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/update-transaction/{id}": {
+            "put": {
+                "description": "Get details of a specific transaction by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Update a transaction based on the invoice status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transaction ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Transaction object",
+                        "name": "model.Transaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Transaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/transactions/{id}": {
+            "get": {
+                "description": "Get details of a specific transaction by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get Transaction details by Transaction ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transaction ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -100,6 +298,17 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -123,6 +332,17 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -146,6 +366,38 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "Get Current User Details",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/refresh-token": {
+            "post": {
+                "description": "Refresh the access token using the refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Refresh user access token",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -157,6 +409,27 @@ const docTemplate = `{
             }
         },
         "/users/{id}": {
+            "get": {
+                "description": "Get all transactions for an active user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get all transactions for a user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            },
             "put": {
                 "description": "Update user information",
                 "consumes": [
@@ -169,6 +442,17 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "Update user details",
+                "parameters": [
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -192,18 +476,91 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "model.Transaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "invoice_id": {
+                    "type": "string"
+                },
+                "invoice_url": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "rent_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "transaction_type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "balance": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:8080",
+	BasePath:         "/api/v1/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Library API",
+	Description:      "This is a sample server for a library API.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

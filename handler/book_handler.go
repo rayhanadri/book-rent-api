@@ -29,6 +29,7 @@ func NewBookHandler(bookRepo repository.BookRepository) BookHandler {
 // @Tags books
 // @Accept json
 // @Produce json
+// @Param id path int true "Book ID"
 // @Success 200 {object} model.Response
 // @Router /books/{id} [get]
 func (h *bookHandler) GetBooksByID(c echo.Context) error {

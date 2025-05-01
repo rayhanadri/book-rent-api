@@ -18,7 +18,7 @@ import (
 // @version 1.0
 // @description This is a sample server for a library API.
 // @host localhost:8080
-// @BasePath /
+// @BasePath /api/v1/
 func ExecRouter() {
 	e := echo.New()
 

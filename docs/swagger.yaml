@@ -1,3 +1,4 @@
+basePath: /api/v1/
 definitions:
   model.Response:
     properties:
@@ -7,24 +8,74 @@ definitions:
       status:
         type: integer
     type: object
+  model.Transaction:
+    properties:
+      amount:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      invoice_id:
+        type: string
+      invoice_url:
+        type: string
+      payment_method:
+        type: string
+      rent_id:
+        type: integer
+      status:
+        type: string
+      transaction_type:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  model.User:
+    properties:
+      balance:
+        type: integer
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
+  description: This is a sample server for a library API.
+  title: Library API
+  version: "1.0"
 paths:
   /books:
     get:
       consumes:
       - application/json
-      description: Get all books in the library
+      description: Retrieve all books' details
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              type: string
-            type: array
-      summary: Get list of books
+            $ref: '#/definitions/model.Response'
+      summary: Get all books
       tags:
       - books
   /books/{id}:
@@ -32,6 +83,12 @@ paths:
       consumes:
       - application/json
       description: Retrieve a book's details by its ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -42,11 +99,46 @@ paths:
       summary: Get a book by ID
       tags:
       - books
+  /rents:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all rents for a user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Get all rents
+      tags:
+      - rents
+    post:
+      consumes:
+      - application/json
+      description: Create a new rent for a user
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Create a new rent
+      tags:
+      - rents
   /rents/{id}:
     get:
       consumes:
       - application/json
       description: Retrieve a rent's details by its ID
+      parameters:
+      - description: Rent ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -57,11 +149,109 @@ paths:
       summary: Get a rent by ID
       tags:
       - rents
+  /rents/return/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Process the return of a rent by its ID
+      parameters:
+      - description: Rent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Return a rent
+      tags:
+      - rents
+  /transactions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Get Transaction details by Transaction ID
+      tags:
+      - transactions
+  /transactions/create-transaction:
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction for a user
+      parameters:
+      - description: Transaction object
+        in: body
+        name: model.Transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.Transaction'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Create a new transaction
+      tags:
+      - transactions
+  /transactions/update-transaction/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Get details of a specific transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Transaction object
+        in: body
+        name: model.Transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Update a transaction based on the invoice status
+      tags:
+      - transactions
   /users:
     post:
       consumes:
       - application/json
       description: Register a new user
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
       produces:
       - application/json
       responses:
@@ -73,10 +263,31 @@ paths:
       tags:
       - users
   /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions for an active user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Get all transactions for a user
+      tags:
+      - transactions
     put:
       consumes:
       - application/json
       description: Update user information
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
       produces:
       - application/json
       responses:
@@ -92,6 +303,13 @@ paths:
       consumes:
       - application/json
       description: Authenticate and return a token for the user
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
       produces:
       - application/json
       responses:
@@ -107,6 +325,12 @@ paths:
       consumes:
       - application/json
       description: Current User Details
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -115,6 +339,21 @@ paths:
           schema:
             $ref: '#/definitions/model.Response'
       summary: Get Current User Details
+      tags:
+      - users
+  /users/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refresh the access token using the refresh token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Refresh user access token
       tags:
       - users
 swagger: "2.0"

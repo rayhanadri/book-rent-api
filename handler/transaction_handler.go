@@ -28,6 +28,15 @@ func NewTransactionHandler(transactionRepo repository.TransactionRepository) Tra
 	return &transactionHandler{transactionRepo: transactionRepo}
 }
 
+// GetAllTransactions godoc
+// @Summary Get all transactions for a user
+// @Description Get all transactions for an active user
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Success 200 {object} model.Response
+// @Router /users/{id} [get]
 func (h *transactionHandler) GetAllTransaction(c echo.Context) error {
 	//get user id from context
 	userID := c.Get("user_id")
@@ -61,6 +70,16 @@ func (h *transactionHandler) GetAllTransaction(c echo.Context) error {
 	})
 }
 
+// CreateTransaction godoc
+// @Summary Create a new transaction
+// @Description Create a new transaction for a user
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Param model.Transaction body model.Transaction true "Transaction object"
+// @Success 201 {object} model.Response
+// @Router /transactions/create-transaction [post] // Updated the router path to use POST method
 func (h *transactionHandler) CreateTransaction(c echo.Context) error {
 	//
 	userID := c.Get("user_id")
@@ -197,8 +216,11 @@ func (h *transactionHandler) CreateTransaction(c echo.Context) error {
 // @Tags transactions
 // @Accept json
 // @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Param id path int true "Transaction ID"
+// @Param model.Transaction body model.Transaction true "Transaction object"
 // @Success 200 {object} model.Response
-// @Router /transactions/{id} [get] // Updated the router path to include transaction ID
+// @Router /transactions/update-transaction/{id} [put] // Updated the router path to use PUT method
 func (h *transactionHandler) UpdateTransaction(c echo.Context) error {
 	//get user id from context
 	userID := c.Get("user_id")
@@ -343,6 +365,8 @@ func (h *transactionHandler) UpdateTransaction(c echo.Context) error {
 // @Tags transactions
 // @Accept json
 // @Produce json
+// @Authorization header string true "Bearer <access_token>"
+// @Param id path int true "Transaction ID"
 // @Success 200 {object} model.Response
 // @Router /transactions/{id} [get] // Updated the router path to include transaction ID
 func (h *transactionHandler) GetTransactionByID(c echo.Context) error {
