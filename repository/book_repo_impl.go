@@ -6,6 +6,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+type MockBookRepositoryInterface interface {
+	GetBooksByID(id int) (*model.Book, error)
+	GetAllBooks() ([]*model.Book, error)
+}
+
 type MockBookRepository struct {
 	mock.Mock
 }

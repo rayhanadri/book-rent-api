@@ -6,6 +6,14 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+type MockRentRepositoryInterface interface {
+	GetRentByID(user_id int, id int) (*model.Rent, error)
+	GetAllRent(user_id int) (*[]model.Rent, error)
+	CreateRent(user_id int, rent *model.Rent) (*model.Rent, error)
+	ReturnRent(user_id int, id int) (*model.Rent, error)
+	CancelRent(user_id int, id int) (*model.Rent, error)
+}
+
 type MockRentRepository struct {
 	mock.Mock
 }

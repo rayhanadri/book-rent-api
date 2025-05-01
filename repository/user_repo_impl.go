@@ -6,6 +6,13 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+type MockUserRepositoryInterface interface {
+	GetUserByID(id int) (*model.User, error)
+	CreateUser(user *model.User) (*model.User, error)
+	UpdateUser(user *model.User) (*model.User, error)
+	LoginUser(user *model.User) (*model.User, error)
+}
+
 type MockUserRepository struct {
 	mock.Mock
 }

@@ -6,6 +6,14 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+type MockTransactionRepositoryInterface interface {
+	GetAllTransaction(user_id int) (*[]model.Transaction, error)
+	CreateTransaction(user_id int, transaction *model.Transaction) (*model.Transaction, error)
+	GetTransactionByID(user_id int, transactionID int) (*model.Transaction, error)
+	UpdateTransaction(user_id int, transaction *model.Transaction) (*model.Transaction, error)
+	CancelTransaction(user_id int, transactionID int) (*model.Transaction, error)
+}
+
 type MockTransactionRepository struct {
 	mock.Mock
 }
