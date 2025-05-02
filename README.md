@@ -29,8 +29,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/library-book-rent-api.git
-cd library-book-rent-api
+git clone https://github.com/rayhanadri/book-rent-api.git
+cd book-rent-api
 
 # Install dependencies
 go mod tidy
