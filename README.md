@@ -9,7 +9,7 @@
 - 🔎 Book search & availability tracking  
 - 👤 User registration & authentication  
 - 📅 Rent, return, and renewal of books  
-- 💳 Integration with payment gateway for deposits and payment
+- 💳 Integration with payment gateway for deposits and payments
 - 📈 Real-time status updates and transaction history  
 - 🛡️ Secure RESTful APIs with token-based authentication  
 
@@ -19,9 +19,9 @@
 
 - **Language**: Go (Golang)  
 - **Database**: PostgreSQL / MySQL (configurable)  
-- **API**: RESTful using `gorilla/mux` or `gin`  
+- **API**: RESTful using Echo Framework
 - **Authentication**: JWT  
-- **Payments**: Stripe / Razorpay (modular integration)  
+- **Payments**: App Balance / Xendit 
 
 ---
 
