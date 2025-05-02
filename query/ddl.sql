@@ -4,8 +4,8 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(255) NOT NULL DEFAULT 'user',
-    status VARCHAR(255) NOT NULL DEFAULT 'ACTIVE',
+    role VARCHAR(10) NOT NULL DEFAULT 'user',
+    status VARCHAR(10) NOT NULL DEFAULT 'ACTIVE',
     balance INT DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -22,7 +22,7 @@ CREATE TABLE books (
     stock INT NOT NULL,
     available BOOLEAN NOT NULL,
     price INT NOT NULL,
-    description TEXT
+    description VARCHAR(255)
 );
 
 CREATE TABLE rents (
@@ -33,18 +33,18 @@ CREATE TABLE rents (
     total_price INT NOT NULL,
     rent_start_date DATE,
     rent_end_date DATE,
-    rent_status VARCHAR(255),
+    rent_status VARCHAR(10),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE transactions (
     id SERIAL PRIMARY KEY,
-    transaction_type VARCHAR(255) NOT NULL,
-    payment_method VARCHAR(255) NOT NULL,
+    transaction_type VARCHAR(10) NOT NULL,
+    payment_method VARCHAR(10) NOT NULL,
     amount INT NOT NULL,
-    status VARCHAR(255) NOT NULL,
-    description TEXT,
+    status VARCHAR(10) NOT NULL,
+    description VARCHAR(255),
     user_id INT REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -52,3 +52,4 @@ CREATE TABLE transactions (
     invoice_url VARCHAR(255),
     rent_id INT NULL REFERENCES rents(id)
 );
+
