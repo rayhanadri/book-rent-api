@@ -18,7 +18,7 @@
 ## 🛠️ Tech Stack
 
 - **Language**: Go (Golang)  
-- **Database**: PostgreSQL / MySQL (configurable)  
+- **Database**: PostgreSQL
 - **API**: RESTful using Echo Framework
 - **Authentication**: JWT  
 - **Payments**: App Balance / Xendit 
