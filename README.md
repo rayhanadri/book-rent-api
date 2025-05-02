@@ -8,7 +8,7 @@
 
 - 🔎 Book search & availability tracking  
 - 👤 User registration & authentication  
-- 📅 Rent, return, and renewal of books  
+- 📅 Rent and return of books  
 - 💳 Integration with payment gateway for deposits and payments
 - 📈 Real-time status updates and transaction history  
 - 🛡️ Secure RESTful APIs with token-based authentication  
