@@ -52,8 +52,10 @@ type InvoiceResponse struct {
 }
 
 func CreateInvoice(amount int, payerEmail string, description string) (InvoiceResponse, error) {
+	timestamp := time.Now().Unix()
+
 	request := CreateInvoiceRequest{
-		ExternalID:  "invoice-{{$timestamp}}",
+		ExternalID:  fmt.Sprintf("invoice-%d", timestamp),
 		Amount:      amount,
 		PayerEmail:  payerEmail,
 		Description: description,
